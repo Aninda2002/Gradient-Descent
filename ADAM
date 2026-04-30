@@ -1,0 +1,98 @@
+# ============================================================
+# IMPORT LIBRARIES
+# ============================================================
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ============================================================
+# DATASET
+# y = 4x + 3
+# ============================================================
+
+X = np.array([[1], [2], [3], [4], [5]], dtype=np.float32)
+y = np.array([[7], [11], [15], [19], [23]], dtype=np.float32)
+
+# ============================================================
+# FUNCTIONS
+# ============================================================
+
+def forward(X, w, b):
+    return np.dot(X, w) + b
+
+
+def compute_loss(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
+
+
+def gradients(X, y, y_pred):
+    m = X.shape[0]
+    dw = (-2 / m) * np.dot(X.T, (y - y_pred))
+    db = (-2 / m) * np.sum(y - y_pred)
+    return dw, db
+
+# ============================================================
+# PLOT FUNCTION
+# ============================================================
+
+def plot_results(losses, title):
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(losses)
+    plt.title(title)
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.grid(True)
+    plt.show()
+
+# ============================================================
+#  ADAM 
+# ============================================================
+
+w = np.random.randn(1, 1)
+b = np.zeros((1,))
+
+mw = np.zeros_like(w)
+vw = np.zeros_like(w)
+
+mb = 0
+vb = 0
+
+beta1 = 0.9
+beta2 = 0.999
+
+lr = 0.01
+epsilon = 1e-8
+epochs = 100
+
+losses = []
+
+for epoch in range(1, epochs + 1):
+
+    y_pred = forward(X, w, b)
+
+    loss = compute_loss(y, y_pred)
+    losses.append(loss)
+
+    dw, db = gradients(X, y, y_pred)
+
+    mw = beta1 * mw + (1 - beta1) * dw
+    mb = beta1 * mb + (1 - beta1) * db
+
+    vw = beta2 * vw + (1 - beta2) * (dw ** 2)
+    vb = beta2 * vb + (1 - beta2) * (db ** 2)
+
+    mw_hat = mw / (1 - beta1 ** epoch)
+    mb_hat = mb / (1 - beta1 ** epoch)
+
+    vw_hat = vw / (1 - beta2 ** epoch)
+    vb_hat = vb / (1 - beta2 ** epoch)
+
+    w = w - (lr * mw_hat) / (np.sqrt(vw_hat) + epsilon)
+    b = b - (lr * mb_hat) / (np.sqrt(vb_hat) + epsilon)
+
+print("Adam")
+print("Weight:", w)
+print("Bias:", b)
+
+plot_results(losses, "Adam Optimizer")
