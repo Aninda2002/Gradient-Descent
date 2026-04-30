@@ -1,0 +1,86 @@
+# ============================================================
+# IMPORT LIBRARIES
+# ============================================================
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ============================================================
+# DATASET
+# y = 4x + 3
+# ============================================================
+
+X = np.array([[1], [2], [3], [4], [5]], dtype=np.float32)
+y = np.array([[7], [11], [15], [19], [23]], dtype=np.float32)
+
+# ============================================================
+# FUNCTIONS
+# ============================================================
+
+def forward(X, w, b):
+    return np.dot(X, w) + b
+
+
+def compute_loss(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
+
+
+def gradients(X, y, y_pred):
+    m = X.shape[0]
+    dw = (-2 / m) * np.dot(X.T, (y - y_pred))
+    db = (-2 / m) * np.sum(y - y_pred)
+    return dw, db
+
+# ============================================================
+# PLOT FUNCTION
+# ============================================================
+
+def plot_results(losses, title):
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(losses)
+    plt.title(title)
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.grid(True)
+    plt.show()
+
+# ============================================================
+#  MINI-BATCH GRADIENT DESCENT
+# ============================================================
+
+w = np.random.randn(1, 1)
+b = np.zeros((1,))
+
+batch_size = 2
+lr = 0.01
+epochs = 100
+
+losses = []
+
+for epoch in range(epochs):
+
+    epoch_loss = 0
+
+    for i in range(0, len(X), batch_size):
+
+        X_batch = X[i:i+batch_size]
+        y_batch = y[i:i+batch_size]
+
+        y_pred = forward(X_batch, w, b)
+
+        loss = compute_loss(y_batch, y_pred)
+        epoch_loss += loss
+
+        dw, db = gradients(X_batch, y_batch, y_pred)
+
+        w = w - lr * dw
+        b = b - lr * db
+
+    losses.append(epoch_loss)
+
+print("Mini Batch GD")
+print("Weight:", w)
+print("Bias:", b)
+
+plot_results(losses, "Mini Batch Gradient Descent")
