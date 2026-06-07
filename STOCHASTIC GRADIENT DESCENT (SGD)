@@ -82,3 +82,5 @@ print("Weight:", w)
 print("Bias:", b)
 
 plot_results(losses, "Stochastic Gradient Descent")
+
+
